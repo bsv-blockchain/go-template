@@ -38,10 +38,7 @@
         </a><br/>
 		<a href=".github/SECURITY.md">
           <img src="https://img.shields.io/badge/security-policy-blue?style=flat&logo=springsecurity&logoColor=white" alt="Security policy">
-        </a><br/>
-		<a href="https://www.bestpractices.dev/projects/10822">
-		  <img src="https://www.bestpractices.dev/projects/10822/badge?style=flat&logo=springsecurity&logoColor=white" alt="OpenSSF Best Practices">
-		</a>
+        </a>
       </td>
       <td valign="top" align="left">
         <a href="https://golang.org/">
@@ -65,7 +62,7 @@
           <img src="https://img.shields.io/github/contributors/bsv-blockchain/go-template?style=flat&logo=contentful&logoColor=white" alt="Contributors">
         </a><br/>
         <a href="https://github.com/sponsors/bsv-blockchain">
-          <img src="https://img.shields.io/badge/sponsor-MrZ-181717.svg?logo=github&style=flat" alt="Sponsor">
+          <img src="https://img.shields.io/badge/sponsor-BSV-181717.svg?logo=github&style=flat" alt="Sponsor">
         </a><br/>
       </td>
     </tr>
@@ -117,7 +114,7 @@ Clone it, [rename a few placeholders](#-template-kick-off-guide-3-easy-steps), a
   _AGENTS.md, CLAUDE.md, cursorrules, and sweep.yaml ensure [ChatGPT](https://openai.com), [Claude](https://claude.ai/), [Cursor](https://www.cursor.com/) & [Sweep](https://sweep.dev/) follow the same house rules._
 
 - **🌍 Community-Ready Meta**  
-  _[Issue/PR templates](.github/ISSUE_TEMPLATE), [CODEOWNERS](.github/CODEOWNERS), [CITATION](CITATION.cff), [label sync](.github/labels.yml), and a welcome bot to show contributors exactly how to get involved._
+  _[Issue/PR templates](.github/ISSUE_TEMPLATE), [CODEOWNERS](.github/CODEOWNERS), [label sync](.github/labels.yml), and a welcome bot to show contributors exactly how to get involved._
 
 <br/>
 
@@ -298,7 +295,6 @@ This glossary describes each tracked file in the repository and notes if it is r
 | [.github/CODE_STANDARDS.md](.github/CODE_STANDARDS.md)                                         | Coding style guide                              | GitHub           |
 | [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)                                             | How to contribute to the project                | GitHub           |
 | [.github/FUNDING.yml](.github/FUNDING.yml)                                                     | Funding links displayed by GitHub               | GitHub           |
-| [.github/IMAGES/go-share-image.png](.github/IMAGES/go-share-image.png)                         | Social sharing image                            | GitHub           |
 | [.github/ISSUE_TEMPLATE/bug_report.yml](.github/ISSUE_TEMPLATE/bug_report.yml)                 | Issue template for bug reports                  | GitHub           |
 | [.github/ISSUE_TEMPLATE/feature_request.yml](.github/ISSUE_TEMPLATE/feature_request.yml)       | Issue template for feature requests             | GitHub           |
 | [.github/ISSUE_TEMPLATE/question.yml](.github/ISSUE_TEMPLATE/question.yml)                     | Issue template for questions                    | GitHub           |
@@ -334,7 +330,6 @@ This glossary describes each tracked file in the repository and notes if it is r
 | [.vscode/launch.json](.vscode/launch.json)                                                     | VS Code debugging configuration                 | VS Code          |
 | [.vscode/settings.json](.vscode/settings.json)                                                 | VS Code workspace settings                      | VS Code          |
 | [.vscode/tasks.json](.vscode/tasks.json)                                                       | VS Code tasks configuration                     | VS Code          |
-| [CITATION.cff](CITATION.cff)                                                                   | Citation metadata recognized by GitHub          | GitHub           |
 | [Dockerfile](Dockerfile)                                                                       | Docker image build instructions                 | Docker           |
 | [LICENSE](LICENSE)                                                                             | Project license                                 | Yours!           |
 | [Makefile](Makefile)                                                                           | Build and lint automation                       | Make             |
@@ -366,12 +361,6 @@ To generate a snapshot (non-versioned) release for testing purposes, run:
 
 ```bash
 make release-snap
-```
-
-Before tagging a new version, update the release metadata in the `CITATION.cff` file:
-
-```bash
-make citation version=0.2.1
 ```
 
 Then create and push a new Git tag using:
@@ -543,7 +532,7 @@ Edit `AGENTS.md` first when adjusting these policies, and keep the other files i
 
 ## 👥 Maintainers
 | [<img src="https://github.com/icellan.png" height="50" alt="Siggi" />](https://github.com/icellan) |
-|:------------------------------------------------------------------------------------------------:|
+|:--------------------------------------------------------------------------------------------------:|
 |                                [Siggi](https://github.com/icellan)                                 |
 
 <br/>

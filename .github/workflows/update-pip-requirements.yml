@@ -6,7 +6,7 @@
 #
 #  Triggers: Runs every Monday at 08:20 UTC and can be triggered manually.
 #
-#  Maintainer: @mrz1836
+#  Maintainer: @icellan
 # ------------------------------------------------------------------------------
 
 name: update-pip-requirements

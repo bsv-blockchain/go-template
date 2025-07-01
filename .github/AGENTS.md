@@ -58,7 +58,6 @@ delivery and open-source collaboration from day one.
 
 For more detailed guidance and supporting documentation, refer to the following project-level resources:
 
-* `CITATION.cff` — Metadata for citing this project; GitHub uses it to render citation information
 * `CODEOWNERS` - Ownership of the repository and various directories
 * `CODE_OF_CONDUCT.md` — Expected behavior and enforcement
 * `CODE_STANDARDS.md` — Style guides and best practices
@@ -749,6 +748,5 @@ All contributors are expected to append entries here when making meaningful chan
 
 | Date       | Author   | Summary of Changes                                           |
 |------------|----------|--------------------------------------------------------------|
-| 2025-06-30 | @mrz1836 | Added pre-commit hook guidelines and config reference        |
-| 2025-06-27 | @mrz1836 | Adapted to fix this project go-template                      |
+| 2025-07-01 | @mrz1836 | Adapted to fix this project go-template                      |
 > For minor edits (typos, formatting), this log update is optional. For all behavioral or structural changes, log entries are **required**.

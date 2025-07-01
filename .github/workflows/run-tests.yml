@@ -131,13 +131,8 @@ jobs:
         run: make govulncheck
 
       # ————————————————————————————————————————————————————————————————
-      # 8. SonarQube Scan
+      # 8. SonarQube Gate Check
       # ————————————————————————————————————————————————————————————————
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
       - name: SonarQube Quality Gate check
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 10

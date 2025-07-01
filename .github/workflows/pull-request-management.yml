@@ -11,7 +11,7 @@
 #
 #  Triggers: On PR open, synchronize, reopen, or ready for review.
 #
-#  Maintainer: @mrz1836
+#  Maintainer: @icellan
 #
 #  Default Assignee: Set below in the 'DEFAULT_ASSIGNEE' variable.
 #
@@ -46,7 +46,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
                       /* eslint-disable no-undef */
-                      const DEFAULT_ASSIGNEE = 'mrz1836'; // <-- change if needed
+                      const DEFAULT_ASSIGNEE = 'icellan'; // <-- change if needed
 
                       // Helpers -------------------------------------------------------
                       const pr = context.payload.pull_request;

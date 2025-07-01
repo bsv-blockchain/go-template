@@ -6,7 +6,7 @@
 #
 #  Triggers  : Scheduled (Mon-Fri at 08:32 UTC) and manual dispatch.
 #
-#  Maintainer: @mrz1836
+#  Maintainer: @icellan
 # ------------------------------------------------------------------------------------
 
 name: stale-check

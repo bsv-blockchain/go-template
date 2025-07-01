@@ -2,16 +2,16 @@ cff-version: 1.2.0
 message: "If you find go-template useful in your software or research, please cite this project using the following citation metadata. A citation helps support future development and encourages best practices in software reuse."
 title: "go-template"
 version: "1.0.4"
-url: "https://github.com/mrz1836/go-template"
-repository: "https://github.com/mrz1836/go-template"
-repository-code: "https://github.com/mrz1836/go-template"
+url: "https://github.com/bsv-blockchain/go-template"
+repository: "https://github.com/bsv-blockchain/go-template"
+repository-code: "https://github.com/bsv-blockchain/go-template"
 date-released: 2021-04-24
 license: "Apache-2.0"
 type: software
 authors:
-  - family-names: "Z"
-    given-names: "Mr"
-    name: "mrz1836"
+  - family-names: "Blockchain"
+    given-names: "BSV"
+    name: "bsv-blockchain"
 keywords:
   - go
   - go-module

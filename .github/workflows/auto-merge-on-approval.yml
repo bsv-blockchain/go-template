@@ -5,7 +5,7 @@
 #
 #  Triggers: Pull‑request events, review submissions, and completed checks.
 #
-#  Maintainer: @mrz1836
+#  Maintainer: @icellan
 #
 #  Rules for Auto‑Merge:
 #    • ≥1 approval review

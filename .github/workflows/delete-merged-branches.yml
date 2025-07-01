@@ -5,7 +5,7 @@
 #
 #  Triggers: Pull request close events.
 #
-#  Maintainer: @mrz1836
+#  Maintainer: @icellan
 # ------------------------------------------------------------------------------
 
 name: delete-merged-branches

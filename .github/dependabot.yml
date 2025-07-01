@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────────────────────
 # Dependabot Configuration
-# Repo: mrz1836/<repo>
+# Repo: bsv-blockchain/<repo>
 #
 # Purpose:
 #   • Keep Go modules, GitHub Actions, DevContainer images/features, and Docker
@@ -43,7 +43,7 @@ updates:
           gomod-minor-patch:
               update-types: ["minor", "patch"]
       open-pull-requests-limit: 10
-      assignees: ["mrz1836"]
+      assignees: ["bsv-blockchain/Teranode"]
       labels: ["chore", "dependencies", "gomod"]
       commit-message:
           prefix: "chore(deps)"
@@ -71,7 +71,7 @@ updates:
           ghactions-all:
               patterns: ["*"]
       open-pull-requests-limit: 10
-      assignees: ["mrz1836"]
+      assignees: ["bsv-blockchain/Teranode"]
       labels: ["chore", "dependencies", "github-actions"]
       commit-message:
           prefix: "chore(deps)"
@@ -94,7 +94,7 @@ updates:
           devcontainer-all:
               patterns: ["*"]
       open-pull-requests-limit: 5
-      assignees: ["mrz1836"]
+      assignees: ["bsv-blockchain/Teranode"]
       labels: ["chore", "dependencies", "devcontainer"]
       commit-message:
           prefix: "chore(deps)"
@@ -120,7 +120,7 @@ updates:
           dockerfiles-all:
               patterns: ["*"]
       open-pull-requests-limit: 5
-      assignees: ["mrz1836"]
+      assignees: ["bsv-blockchain/Teranode"]
       labels: ["chore", "dependencies", "docker"]
       commit-message:
           prefix: "chore(deps)"

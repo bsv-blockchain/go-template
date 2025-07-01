@@ -51,9 +51,9 @@ install-template: ## Kick-start a fresh copy of go-template (run once!)
 	     -and -not -name '*.gif' -and -not -name '*.ico' \) \
 	  -print0 | \
 	  env LC_ALL=C xargs -0 $(SED) $(SED_INPLACE) \
-	    -e 's#mrz1836/go-template#$(owner)/$(repo)#g' \
+	    -e 's#bsv-blockchain/go-template#$(owner)/$(repo)#g' \
 	    -e 's#go-template#$(repo)#g' \
-	    -e 's#mrz1836#$(owner)#g'; \
+	    -e 's#bsv-blockchain#$(owner)#g'; \
 	\
 	# --------------------------------------------------------------------
 	# 3. Remove default share image (optional)

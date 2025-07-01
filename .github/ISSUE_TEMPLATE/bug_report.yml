@@ -3,7 +3,7 @@ description: Report incorrect behavior, test failure, or unexpected output in th
 title: "[Bug] <brief description of the issue>"
 labels: ["bug-p3"]
 assignees:
-    - mrz1836
+    - bsv-blockchain/Teranode
 body:
     - type: textarea
       id: bug_description

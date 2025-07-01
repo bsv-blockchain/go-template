@@ -3,7 +3,7 @@ package template_test
 import (
 	"fmt"
 
-	"github.com/mrz1836/go-template"
+	"github.com/bsv-blockchain/go-template"
 )
 
 // ExampleGreet demonstrates the usage of the Greet function.

@@ -8,7 +8,7 @@ Need help with **go-template**? You're in the right place. Here’s how to get s
 
 Before asking, check the existing threads:
 
-* 🔍 Search [Discussions](https://github.com/mrz1836/go-template/discussions)
+* 🔍 Search [Discussions](https://github.com/bsv-blockchain/go-template/discussions)
 * 🆕 Can’t find what you need? Start a new topic and ask away!
 
 <br/>
@@ -17,7 +17,7 @@ Before asking, check the existing threads:
 
 Found a bug?
 
-1. Check the [issue tracker](https://github.com/mrz1836/go-template/issues) to avoid duplicates.
+1. Check the [issue tracker](https://github.com/bsv-blockchain/go-template/issues) to avoid duplicates.
 2. If it’s new, open an issue with:
 
 	* Clear steps to reproduce
@@ -46,7 +46,7 @@ Everything from commit rules to contributor expectations is in [AGENTS.md](./AGE
 ## 📬 Private Contact
 
 For sensitive or non-public concerns, reach out to:
-📧 [go-template@mrz1818.com](mailto:go-template@mrz1818.com)
+📧 [security@bsvassociation.org](mailto:security@bsvassociation.org)
 
 <br/>
 

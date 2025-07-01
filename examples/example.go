@@ -4,7 +4,7 @@ package main
 import (
 	"log"
 
-	"github.com/mrz1836/go-template"
+	"github.com/bsv-blockchain/go-template"
 )
 
 func main() {

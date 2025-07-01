@@ -34,6 +34,9 @@
 - name: "chore"
   description: "Simple dependency updates or version bumps"
   color: 006b75
+- name: "dependencies"
+  description: "Dependency updates, version bumps, etc."
+  color: 006b75
 - name: "update"
   description: "General updates"
   color: 006b75

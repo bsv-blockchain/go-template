@@ -26,7 +26,7 @@ name: auto-merge-on-approval
 on:
     pull_request:
         types:
-          [opened, synchronize, reopened, ready_for_review, labeled, unlabeled, edited]
+          [opened, synchronize, reopened, ready_for_review, labeled, unlabeled, edited, review_requested, review_request_removed]
     pull_request_review:
         types: [submitted]
     check_suite:

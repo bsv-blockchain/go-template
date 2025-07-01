@@ -158,7 +158,7 @@ jobs:
                         owner: context.repo.owner,
                         repo:  context.repo.repo,
                         issue_number: Number('${{ steps.pr.outputs.number }}'),
-                        body: '⚠️ @icellan – this is a **major** version bump and needs manual review.'
+                        body: '⚠️ @galt-tr @mrz1836 – this is a **major** version bump and needs manual review.'
                       });
 
 
@@ -175,7 +175,7 @@ jobs:
                         owner: context.repo.owner,
                         repo:  context.repo.repo,
                         issue_number: Number('${{ steps.pr.outputs.number }}'),
-                        body: '⚠️ @icellan – Dependabot could not determine version semantics (SHA → SHA). Please review manually.'
+                        body: '⚠️ @galt-tr @mrz1836 – Dependabot could not determine version semantics (SHA → SHA). Please review manually.'
                       });
 
 

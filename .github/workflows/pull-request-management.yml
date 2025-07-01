@@ -46,7 +46,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
                       /* eslint-disable no-undef */
-                      const DEFAULT_ASSIGNEE = 'icellan'; // <-- change if needed
+                      const DEFAULT_ASSIGNEE = 'galt-tr'; // <-- change if needed
 
                       // Helpers -------------------------------------------------------
                       const pr           = context.payload.pull_request;

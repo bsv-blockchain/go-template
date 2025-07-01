@@ -22,9 +22,9 @@
 		<a href="https://github.com/bsv-blockchain/go-template/actions">
           <img src="https://github.com/bsv-blockchain/go-template/actions/workflows/codeql-analysis.yml/badge.svg?style=flat" alt="CodeQL">
         </a><br/>
-        <a href="https://github.com/bsv-blockchain/go-template/commits/master">
-		  <img src="https://img.shields.io/github/last-commit/bsv-blockchain/go-template?style=flat&logo=clockify&logoColor=white" alt="Last commit">
-		</a>
+		<a href="https://sonarcloud.io/project/overview?id=bsv-blockchain_go-template">
+          <img src="https://sonarcloud.io/api/project_badges/measure?project=bsv-blockchain_go-template&metric=alert_status&style-flat" alt="SonarCloud">
+        </a>
       </td>
       <td valign="top" align="left">
         <a href="https://goreportcard.com/report/github.com/bsv-blockchain/go-template">
@@ -61,6 +61,9 @@
         <a href="https://github.com/bsv-blockchain/go-template/graphs/contributors">
           <img src="https://img.shields.io/github/contributors/bsv-blockchain/go-template?style=flat&logo=contentful&logoColor=white" alt="Contributors">
         </a><br/>
+		<a href="https://github.com/bsv-blockchain/go-template/commits/master">
+		  <img src="https://img.shields.io/github/last-commit/bsv-blockchain/go-template?style=flat&logo=clockify&logoColor=white" alt="Last commit">
+		</a><br/>
         <a href="https://github.com/sponsors/bsv-blockchain">
           <img src="https://img.shields.io/badge/sponsor-BSV-181717.svg?logo=github&style=flat" alt="Sponsor">
         </a><br/>

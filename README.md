@@ -212,7 +212,7 @@ Push your initial commit and run `make tag version=0.1.0` and the CI/CD pipeline
 ```text
 ┌──────────────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                          │
-│           MR. Z'S GO-TEMPLATE – YOUR README STARTS RIGHT AFTER THIS BANNER               │
+│                 GO-TEMPLATE – YOUR README STARTS RIGHT AFTER THIS BANNER                 │
 │                                                                                          │
 └──────────────────────────────────────────────────────────────────────────────────────────┘
                                          ⬇ ⬇ ⬇

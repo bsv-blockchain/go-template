@@ -94,7 +94,7 @@ updates:
       devcontainer-all:
         patterns: [ "*" ]
     open-pull-requests-limit: 5
-    [ "galt-tr","mrz1836" ]
+    assignees: [ "galt-tr","mrz1836" ]
     labels: [ "chore", "dependencies", "devcontainer" ]
     commit-message:
       prefix: "chore"

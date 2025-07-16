@@ -1,14 +1,22 @@
 # ------------------------------------------------------------------------------------
 #  Stale Check Workflow
 #
-#  Purpose: Warn about and close inactive issues and PRs
+#  Purpose: Warn about and close inactive issues and PRs to maintain repository hygiene.
+#  This workflow identifies stale items, marks them with a label, and eventually closes
+#  them if no activity occurs within the configured timeframe.
 #
-#  Triggers: Scheduled (Mon-Fri at 08:32 UTC) and manual dispatch.
+#  Configuration: All settings are loaded from .github/.env.shared for centralized
+#  management across all workflows.
 #
-#  Maintainer: @icellan
+#  Triggers:
+#  - Scheduled: Monday-Friday at 08:32 UTC
+#  - Manual: Via workflow_dispatch
+#
+#  Maintainer: @mrz1836
+#
 # ------------------------------------------------------------------------------------
 
-name: stale-check
+name: Stale Check
 
 # ————————————————————————————————————————————————————————————————
 # Trigger Configuration
@@ -16,8 +24,8 @@ name: stale-check
 on:
   schedule:
     # ┌─ min  ─┬─ hour ─┬─ dom ─┬─ mon ─┬─ dow ─┐
-    - cron: '32 8 * * 1-5'         # Mon‑Fri at 08:32 UTC
-  workflow_dispatch:               # Allow manual triggering
+    - cron: '0 12 * * 1-5'  # 7:00 AM EST (12:00 UTC)
+  workflow_dispatch:        # Allow manual triggering
 
 # ————————————————————————————————————————————————————————————————
 # Permissions
@@ -32,60 +40,136 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# ————————————————————————————————————————————————————————————————
-# Environment Variables
-# ————————————————————————————————————————————————————————————————
-env:
-  DAYS_BEFORE_STALE: 60
-  DAYS_BEFORE_CLOSE: 14
-  STALE_LABEL: stale
-  EXEMPT_ISSUE_LABELS: work-in-progress,security,requires-manual-review
-  EXEMPT_PR_LABELS: work-in-progress,security,requires-manual-review
-  OPERATIONS_PER_RUN: 300
-
 jobs:
+  # ----------------------------------------------------------------------------------
+  # Load Environment Variables from .env.shared
+  # ----------------------------------------------------------------------------------
+  load-env:
+    name: 🌍 Load Environment Variables
+    runs-on: ubuntu-latest
+    outputs:
+      env-json: ${{ steps.load-env.outputs.env-json }}
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Check out code to access env file
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout code (sparse)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          sparse-checkout: |
+            .github/.env.shared
+            .github/actions/load-env
+
+      # ————————————————————————————————————————————————————————————————
+      # Load and parse environment file
+      # ————————————————————————————————————————————————————————————————
+      - name: 🌍 Load environment variables
+        uses: ./.github/actions/load-env
+        id: load-env
+
+  # ----------------------------------------------------------------------------------
+  # Main Stale Check Job
+  # ----------------------------------------------------------------------------------
   stale-check:
+    name: 🧹 Process Stale Items
+    needs: [load-env]
     runs-on: ubuntu-latest
     permissions:
-      issues: write # Required to add labels and comments
-      pull-requests: write # Required to add labels and comments on PRs
+      issues: write                       # Required to add labels and comments
+      pull-requests: write                # Required to add labels and comments on PRs
 
     steps:
       # ————————————————————————————————————————————————————————————————
-      # 1. Calculate cutoff dates for stale detection
+      # Log token configuration
       # ————————————————————————————————————————————————————————————————
-      - name: Calculate cutoff dates
+      - name: 🔑 Log token configuration
+        env:
+          ENV_JSON: ${{ needs.load-env.outputs.env-json }}
+        run: |
+          PREFERRED_TOKEN=$(echo "$ENV_JSON" | jq -r '.PREFERRED_GITHUB_TOKEN')
+
+          if [[ "$PREFERRED_TOKEN" == "GH_PAT_TOKEN" && -n "${{ secrets.GH_PAT_TOKEN }}" ]]; then
+            echo "✅ Using Personal Access Token (PAT) for stale check operations"
+          else
+            echo "✅ Using default GITHUB_TOKEN for stale check operations"
+          fi
+
+      # ————————————————————————————————————————————————————————————————
+      # Extract environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Extract stale configuration
+        id: config
+        env:
+          ENV_JSON: ${{ needs.load-env.outputs.env-json }}
+        run: |
+          echo "🎯 Extracting stale workflow configuration..."
+
+          # Extract stale-specific variables from JSON
+          DAYS_BEFORE_STALE=$(echo "$ENV_JSON" | jq -r '.STALE_DAYS_BEFORE_STALE')
+          DAYS_BEFORE_CLOSE=$(echo "$ENV_JSON" | jq -r '.STALE_DAYS_BEFORE_CLOSE')
+          STALE_LABEL=$(echo "$ENV_JSON" | jq -r '.STALE_LABEL')
+          EXEMPT_ISSUE_LABELS=$(echo "$ENV_JSON" | jq -r '.STALE_EXEMPT_ISSUE_LABELS')
+          EXEMPT_PR_LABELS=$(echo "$ENV_JSON" | jq -r '.STALE_EXEMPT_PR_LABELS')
+          OPERATIONS_PER_RUN=$(echo "$ENV_JSON" | jq -r '.STALE_OPERATIONS_PER_RUN')
+
+          # Export to outputs
+          echo "days-before-stale=$DAYS_BEFORE_STALE" >> $GITHUB_OUTPUT
+          echo "days-before-close=$DAYS_BEFORE_CLOSE" >> $GITHUB_OUTPUT
+          echo "stale-label=$STALE_LABEL" >> $GITHUB_OUTPUT
+          echo "exempt-issue-labels=$EXEMPT_ISSUE_LABELS" >> $GITHUB_OUTPUT
+          echo "exempt-pr-labels=$EXEMPT_PR_LABELS" >> $GITHUB_OUTPUT
+          echo "operations-per-run=$OPERATIONS_PER_RUN" >> $GITHUB_OUTPUT
+
+          echo "✅ Configuration extracted successfully"
+
+      # ————————————————————————————————————————————————————————————————
+      # Calculate cutoff dates for stale detection
+      # ————————————————————————————————————————————————————————————————
+      - name: 📅 Calculate cutoff dates
         id: dates
         run: |
+          echo "⏱️ Calculating stale and close cutoff dates..."
+
           # Calculate dates for stale marking and closing
-          stale_date=$(date -d "${{ env.DAYS_BEFORE_STALE }} days ago" --iso-8601)
-          close_date=$(date -d "$(( ${{ env.DAYS_BEFORE_STALE }} + ${{ env.DAYS_BEFORE_CLOSE }} )) days ago" --iso-8601)
+          DAYS_BEFORE_STALE="${{ steps.config.outputs.days-before-stale }}"
+          DAYS_BEFORE_CLOSE="${{ steps.config.outputs.days-before-close }}"
+
+          stale_date=$(date -d "$DAYS_BEFORE_STALE days ago" --iso-8601)
+          close_date=$(date -d "$(( $DAYS_BEFORE_STALE + $DAYS_BEFORE_CLOSE )) days ago" --iso-8601)
 
           echo "stale_cutoff=${stale_date}" >> $GITHUB_OUTPUT
           echo "close_cutoff=${close_date}" >> $GITHUB_OUTPUT
 
-          echo "=== Stale Check Configuration ==="
-          echo "Stale cutoff date: ${stale_date} (${DAYS_BEFORE_STALE} days ago)"
-          echo "Close cutoff date: ${close_date} ($(( ${DAYS_BEFORE_STALE} + ${DAYS_BEFORE_CLOSE} )) days ago)"
-          echo "Stale label: ${{ env.STALE_LABEL }}"
-          echo "Operations limit: ${{ env.OPERATIONS_PER_RUN }}"
+          echo "📊 === Stale Check Configuration ==="
+          echo "🔸 Stale cutoff date: ${stale_date} (${DAYS_BEFORE_STALE} days ago)"
+          echo "🔸 Close cutoff date: ${close_date} ($(( ${DAYS_BEFORE_STALE} + ${DAYS_BEFORE_CLOSE} )) days ago)"
+          echo "🔸 Stale label: ${{ steps.config.outputs.stale-label }}"
+          echo "🔸 Operations limit: ${{ steps.config.outputs.operations-per-run }}"
+          echo "✅ Date calculations complete"
 
       # ————————————————————————————————————————————————————————————————
-      # 2. Process issues for stale marking and closing
+      # Process issues for stale marking and closing
       # ————————————————————————————————————————————————————————————————
-      - name: Process stale issues
+      - name: 📋 Process stale issues
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          ENV_JSON: ${{ needs.load-env.outputs.env-json }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
             const staleCutoff = '${{ steps.dates.outputs.stale_cutoff }}';
             const closeCutoff = '${{ steps.dates.outputs.close_cutoff }}';
-            const staleLabel = '${{ env.STALE_LABEL }}';
-            const exemptLabels = '${{ env.EXEMPT_ISSUE_LABELS }}'.split(',').map(l => l.trim()).filter(l => l);
-            const operationsLimit = parseInt('${{ env.OPERATIONS_PER_RUN }}');
+            const staleLabel = '${{ steps.config.outputs.stale-label }}';
+            const exemptLabels = '${{ steps.config.outputs.exempt-issue-labels }}'.split(',').map(l => l.trim()).filter(l => l);
+            const operationsLimit = parseInt('${{ steps.config.outputs.operations-per-run }}');
+            const daysBeforeClose = parseInt('${{ steps.config.outputs.days-before-close }}');
+            const envJson = JSON.parse(process.env.ENV_JSON);
+            const preferredToken = envJson.PREFERRED_GITHUB_TOKEN;
+            const isUsingPAT = preferredToken === 'GH_PAT_TOKEN' && '${{ secrets.GH_PAT_TOKEN }}' !== '';
 
-            console.log('=== Processing Issues ===');
-            console.log(`Exempt labels: ${exemptLabels.join(', ')}`);
+            console.log('📋 === Processing Issues ===');
+            console.log(`🏷️ Exempt labels: ${exemptLabels.join(', ')}`);
+            console.log(`🔑 Token type: ${isUsingPAT ? 'Personal Access Token (PAT)' : 'Default GITHUB_TOKEN'}`);
 
             let operationsCount = 0;
             let processedCount = 0;
@@ -128,7 +212,7 @@ jobs:
                 const updatedAt = new Date(issue.updated_at);
                 const daysSinceUpdate = Math.floor((Date.now() - updatedAt.getTime()) / (1000 * 60 * 60 * 24));
 
-                console.log(`Processing issue #${issue.number}: "${issue.title}" (updated ${daysSinceUpdate} days ago)`);
+                console.log(`🔍 Processing issue #${issue.number}: "${issue.title}" (updated ${daysSinceUpdate} days ago)`);
 
                 // Skip if issue has exempt labels
                 if (hasExemptLabel(issue)) {
@@ -145,7 +229,7 @@ jobs:
                       owner: context.repo.owner,
                       repo: context.repo.repo,
                       issue_number: issue.number,
-                      body: `This issue was automatically closed after **${daysSinceUpdate} days** of inactivity. If this is still relevant, feel free to re‑open.`
+                      body: `This issue was automatically closed after **${daysSinceUpdate} days** of inactivity. If this is still relevant, feel free to re-open.`
                     });
 
                     await github.rest.issues.update({
@@ -176,7 +260,7 @@ jobs:
                       owner: context.repo.owner,
                       repo: context.repo.repo,
                       issue_number: issue.number,
-                      body: `This issue has been inactive for **${daysSinceUpdate} days** and will be closed in ${{ env.DAYS_BEFORE_CLOSE }} days if no further activity occurs.`
+                      body: `This issue has been inactive for **${daysSinceUpdate} days** and will be closed in ${daysBeforeClose} days if no further activity occurs.`
                     });
 
                     console.log(`  🏷️ Marked issue #${issue.number} as stale`);
@@ -194,28 +278,31 @@ jobs:
               if (operationsCount >= operationsLimit) break;
             }
 
-            console.log('\n=== Issues Summary ===');
-            console.log(`Processed: ${processedCount} issues`);
-            console.log(`Marked stale: ${markedStaleCount} issues`);
-            console.log(`Closed: ${closedCount} issues`);
-            console.log(`Operations used: ${operationsCount}/${operationsLimit}`);
+            console.log('\n📊 === Issues Summary ===');
+            console.log(`✅ Processed: ${processedCount} issues`);
+            console.log(`🏷️ Marked stale: ${markedStaleCount} issues`);
+            console.log(`🔒 Closed: ${closedCount} issues`);
+            console.log(`⚡ Operations used: ${operationsCount}/${operationsLimit}`);
 
       # ————————————————————————————————————————————————————————————————
-      # 3. Process pull-requests for stale marking and closing
+      # Process pull requests for stale marking and closing
       # ————————————————————————————————————————————————————————————————
-      - name: Process stale pull requests
+      - name: 🔀 Process stale pull requests
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          ENV_JSON: ${{ needs.load-env.outputs.env-json }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
             const staleCutoff = '${{ steps.dates.outputs.stale_cutoff }}';
             const closeCutoff = '${{ steps.dates.outputs.close_cutoff }}';
-            const staleLabel = '${{ env.STALE_LABEL }}';
-            const exemptLabels = '${{ env.EXEMPT_PR_LABELS }}'.split(',').map(l => l.trim()).filter(l => l);
-            const operationsLimit = parseInt('${{ env.OPERATIONS_PER_RUN }}');
+            const staleLabel = '${{ steps.config.outputs.stale-label }}';
+            const exemptLabels = '${{ steps.config.outputs.exempt-pr-labels }}'.split(',').map(l => l.trim()).filter(l => l);
+            const operationsLimit = parseInt('${{ steps.config.outputs.operations-per-run }}');
+            const daysBeforeClose = parseInt('${{ steps.config.outputs.days-before-close }}');
 
-            console.log('\n=== Processing Pull Requests ===');
-            console.log(`Exempt labels: ${exemptLabels.join(', ')}`);
+            console.log('\n🔀 === Processing Pull Requests ===');
+            console.log(`🏷️ Exempt labels: ${exemptLabels.join(', ')}`);
 
             let operationsCount = 0;
             let processedCount = 0;
@@ -254,7 +341,7 @@ jobs:
                 const updatedAt = new Date(pr.updated_at);
                 const daysSinceUpdate = Math.floor((Date.now() - updatedAt.getTime()) / (1000 * 60 * 60 * 24));
 
-                console.log(`Processing PR #${pr.number}: "${pr.title}" (updated ${daysSinceUpdate} days ago)`);
+                console.log(`🔍 Processing PR #${pr.number}: "${pr.title}" (updated ${daysSinceUpdate} days ago)`);
 
                 // Skip draft PRs
                 if (pr.draft) {
@@ -277,7 +364,7 @@ jobs:
                       owner: context.repo.owner,
                       repo: context.repo.repo,
                       issue_number: pr.number,
-                      body: `This PR was automatically closed after **${daysSinceUpdate} days** of inactivity. If you plan to resume work, please re‑open.`
+                      body: `This PR was automatically closed after **${daysSinceUpdate} days** of inactivity. If you plan to resume work, please re-open.`
                     });
 
                     await github.rest.pulls.update({
@@ -308,7 +395,7 @@ jobs:
                       owner: context.repo.owner,
                       repo: context.repo.repo,
                       issue_number: pr.number,
-                      body: `This pull request has been inactive for **${daysSinceUpdate} days** and will be closed in ${{ env.DAYS_BEFORE_CLOSE }} days if no further activity occurs.`
+                      body: `This pull request has been inactive for **${daysSinceUpdate} days** and will be closed in ${daysBeforeClose} days if no further activity occurs.`
                     });
 
                     console.log(`  🏷️ Marked PR #${pr.number} as stale`);
@@ -326,68 +413,161 @@ jobs:
               if (operationsCount >= operationsLimit) break;
             }
 
-            console.log('\n=== Pull Requests Summary ===');
-            console.log(`Processed: ${processedCount} PRs`);
-            console.log(`Marked stale: ${markedStaleCount} PRs`);
-            console.log(`Closed: ${closedCount} PRs`);
-            console.log(`Operations used: ${operationsCount}/${operationsLimit}`);
+            console.log('\n📊 === Pull Requests Summary ===');
+            console.log(`✅ Processed: ${processedCount} PRs`);
+            console.log(`🏷️ Marked stale: ${markedStaleCount} PRs`);
+            console.log(`🔒 Closed: ${closedCount} PRs`);
+            console.log(`⚡ Operations used: ${operationsCount}/${operationsLimit}`);
 
       # ————————————————————————————————————————————————————————————————
-      # 4. Clean up stale labels from recently updated items
+      # Clean up stale labels from recently updated items
       # ————————————————————————————————————————————————————————————————
-      - name: Remove stale labels from updated items
+      - name: 🏷️ Remove stale labels from updated items
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
-            const staleCutoff = '${{ steps.dates.outputs.stale_cutoff }}';
-            const staleLabel = '${{ env.STALE_LABEL }}';
+            const staleCutoff = new Date('${{ steps.dates.outputs.stale_cutoff }}');
+            const staleLabel = '${{ steps.config.outputs.stale-label }}';
 
-            console.log('\n=== Cleaning Stale Labels ===');
-            console.log('Looking for recently updated items with stale labels...');
+            console.log('\n🏷️ === Cleaning Stale Labels ===');
+            console.log('🔍 Looking for recently updated items with stale labels...');
 
             let removedCount = 0;
+            let checkedCount = 0;
 
-            // Find issues with stale label that have been updated recently
-            const staleIssues = await github.rest.search.issuesAndPullRequests({
-              q: `repo:${context.repo.owner}/${context.repo.repo} is:open label:"${staleLabel}" updated:>${staleCutoff}`,
+            // Helper function to check if item should have stale label removed
+            function shouldRemoveStaleLabel(item) {
+              const updatedAt = new Date(item.updated_at);
+              return updatedAt > staleCutoff;
+            }
+
+            // Process issues with stale label
+            console.log('📋 Checking issues...');
+            const issuesIterator = github.paginate.iterator(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: staleLabel,
               per_page: 100
             });
 
-            for (const item of staleIssues.data.items) {
-              try {
-                await github.rest.issues.removeLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: item.number,
-                  name: staleLabel
-                });
+            for await (const { data: issues } of issuesIterator) {
+              for (const issue of issues) {
+                // Skip pull requests (they're handled separately)
+                if (issue.pull_request) continue;
 
-                const itemType = item.pull_request ? 'PR' : 'issue';
-                console.log(`  ✅ Removed stale label from ${itemType} #${item.number}: "${item.title}"`);
-                removedCount++;
-              } catch (error) {
-                if (error.status === 404) {
-                  console.log(`  ℹ️ Label not found on #${item.number} (already removed)`);
-                } else {
-                  console.log(`  ❌ Failed to remove stale label from #${item.number}: ${error.message}`);
+                checkedCount++;
+
+                if (shouldRemoveStaleLabel(issue)) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      name: staleLabel
+                    });
+
+                    console.log(`  ✅ Removed stale label from issue #${issue.number}: "${issue.title}"`);
+                    removedCount++;
+                  } catch (error) {
+                    if (error.status === 404) {
+                      console.log(`  ℹ️ Label not found on issue #${issue.number} (already removed)`);
+                    } else {
+                      console.log(`  ❌ Failed to remove stale label from issue #${issue.number}: ${error.message}`);
+                    }
+                  }
                 }
               }
             }
 
-            console.log(`\n=== Label Cleanup Summary ===`);
-            console.log(`Removed stale labels from: ${removedCount} items`);
+            // Process pull requests with stale label
+            console.log('\n🔀 Checking pull requests...');
+            const prsIterator = github.paginate.iterator(github.rest.pulls.list, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            for await (const { data: prs } of prsIterator) {
+              for (const pr of prs) {
+                // Check if PR has stale label
+                const prDetails = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number
+                });
+
+                const hasStaleLabel = prDetails.data.labels.some(label => label.name === staleLabel);
+
+                if (hasStaleLabel) {
+                  checkedCount++;
+
+                  if (shouldRemoveStaleLabel(pr)) {
+                    try {
+                      await github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pr.number,
+                        name: staleLabel
+                      });
+
+                      console.log(`  ✅ Removed stale label from PR #${pr.number}: "${pr.title}"`);
+                      removedCount++;
+                    } catch (error) {
+                      if (error.status === 404) {
+                        console.log(`  ℹ️ Label not found on PR #${pr.number} (already removed)`);
+                      } else {
+                        console.log(`  ❌ Failed to remove stale label from PR #${pr.number}: ${error.message}`);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            console.log(`\n📊 === Label Cleanup Summary ===`);
+            console.log(`🔍 Checked: ${checkedCount} items with stale label`);
+            console.log(`✅ Removed stale labels from: ${removedCount} items`);
 
       # ————————————————————————————————————————————————————————————————
-      # 5. Final workflow status report
+      # Generate a workflow summary report
       # ————————————————————————————————————————————————————————————————
-      - name: Report workflow status
+      - name: 📊 Generate workflow summary
+        env:
+          ENV_JSON: ${{ needs.load-env.outputs.env-json }}
         run: |
-          echo "=== Stale Check Workflow Complete ==="
-          echo "🕐 Completed: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          echo "📊 Check the job logs above for detailed statistics"
-          echo "⚙️ Configuration:"
-          echo "  - Days before stale: ${{ env.DAYS_BEFORE_STALE }}"
-          echo "  - Days before close: ${{ env.DAYS_BEFORE_CLOSE }}"
-          echo "  - Stale label: ${{ env.STALE_LABEL }}"
-          echo "  - Operations limit: ${{ env.OPERATIONS_PER_RUN }}"
+          echo "🚀 Generating workflow summary..."
+
+          # Determine which token was used
+          PREFERRED_TOKEN=$(echo "$ENV_JSON" | jq -r '.PREFERRED_GITHUB_TOKEN')
+          if [[ "$PREFERRED_TOKEN" == "GH_PAT_TOKEN" && -n "${{ secrets.GH_PAT_TOKEN }}" ]]; then
+            TOKEN_TYPE="🔑 Personal Access Token (PAT)"
+          else
+            TOKEN_TYPE="🔑 Default GITHUB_TOKEN"
+          fi
+
+          echo "# 🧹 Stale Check Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**⏰ Completed:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "## ⚙️ Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Days before stale | ${{ steps.config.outputs.days-before-stale }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Days before close | ${{ steps.config.outputs.days-before-close }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Stale label | ${{ steps.config.outputs.stale-label }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Operations limit | ${{ steps.config.outputs.operations-per-run }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Token type | $TOKEN_TYPE |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "## 🏷️ Exempt Labels" >> $GITHUB_STEP_SUMMARY
+          echo "- **Issues:** ${{ steps.config.outputs.exempt-issue-labels }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Pull Requests:** ${{ steps.config.outputs.exempt-pr-labels }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "📋 _Check the job logs above for detailed processing statistics._" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Stale check workflow completed successfully!**" >> $GITHUB_STEP_SUMMARY

@@ -307,7 +307,6 @@ This glossary describes each tracked file in the repository and notes if it is r
 | [.github/actions/warm-cache/action.yml](.github/actions/warm-cache/action.yml)                       | Action to warm GitHub Actions cache             | GitHub Actions   |
 | [.github/dependabot.yml](.github/dependabot.yml)                                                     | Dependabot configuration                        | GitHub           |
 | [.github/labels.yml](.github/labels.yml)                                                             | Repository label definitions                    | GitHub           |
-| [.github/pip-requirements.txt](.github/pip-requirements.txt)                                         | Python requirements for pre-commit hooks        | GitHub           |
 | [.github/pull_request_template.md](.github/pull_request_template.md)                                 | Pull request description template               | GitHub           |
 | [.github/sweep.yaml](.github/sweep.yaml)                                                             | Sweep AI configuration                          | Sweep AI         |
 | [.github/workflows/auto-merge-on-approval.yml](.github/workflows/auto-merge-on-approval.yml)         | Workflow for automatic merges                   | GitHub Actions   |

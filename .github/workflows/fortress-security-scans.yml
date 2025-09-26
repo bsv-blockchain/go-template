@@ -116,13 +116,13 @@ jobs:
       - name: 🔍 Ask Nancy
         uses: sonatype-nexus-community/nancy-github-action@726e338312e68ecdd4b4195765f174d3b3ce1533 # v1.0.3
         continue-on-error: false
-        env: # Authentication for OSS Index (recommended)
+        env: # Authentication for OSS Index (fallback + pass-through)
           OSSI_USERNAME: ${{ secrets.ossi-username }}
           OSSI_TOKEN: ${{ secrets.ossi-token }}
         with:
           githubToken: ${{ secrets.github-token }} # ← prevents rate-limit 403
           nancyVersion: ${{ env.NANCY_VERSION }}
-          nancyCommand: sleuth --loud --exclude-vulnerability ${{ env.NANCY_EXCLUDES }}
+          nancyCommand: sleuth --loud --exclude-vulnerability ${{ env.NANCY_EXCLUDES }} --username "${{ secrets.ossi-username }}" --token "${{ secrets.ossi-token }}"
 
       # ————————————————————————————————————————————————————————————————
       # Summary of Nancy results

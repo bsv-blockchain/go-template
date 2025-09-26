@@ -111,18 +111,28 @@ jobs:
           echo "✅ Module list generated successfully"
 
       # ————————————————————————————————————————————————————————————————
+      # Install Nancy Directly
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Install Nancy
+        run: |
+          echo "📥 Installing Nancy version ${{ env.NANCY_VERSION }}..."
+          curl -L https://github.com/sonatype-nexus-community/nancy/releases/download/${{ env.NANCY_VERSION }}/nancy-${{ env.NANCY_VERSION }}-linux-amd64 -o nancy
+          chmod +x nancy
+          ./nancy --version
+          echo "✅ Nancy installed successfully"
+
+      # ————————————————————————————————————————————————————————————————
       # Run Nancy to check for vulnerabilities
       # ————————————————————————————————————————————————————————————————
       - name: 🔍 Ask Nancy
-        uses: sonatype-nexus-community/nancy-github-action@726e338312e68ecdd4b4195765f174d3b3ce1533 # v1.0.3
         continue-on-error: false
-        env: # Authentication for OSS Index (recommended)
+        env: # Authentication for OSS Index
           OSSI_USERNAME: ${{ secrets.ossi-username }}
           OSSI_TOKEN: ${{ secrets.ossi-token }}
-        with:
-          githubToken: ${{ secrets.github-token }} # ← prevents rate-limit 403
-          nancyVersion: ${{ env.NANCY_VERSION }}
-          nancyCommand: sleuth --loud --exclude-vulnerability ${{ env.NANCY_EXCLUDES }}
+        run: |
+          echo "🔍 Running Nancy security scan..."
+          ./nancy sleuth --loud --exclude-vulnerability ${{ env.NANCY_EXCLUDES }} < go.list
+          echo "✅ Nancy scan completed"
 
       # ————————————————————————————————————————————————————————————————
       # Summary of Nancy results

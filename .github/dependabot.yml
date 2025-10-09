@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────────────────────
 # Dependabot Configuration
-# Repo: bsv-blockchain/<repo>
+# Repo: mrz1836/<repo>
 #
 # Purpose:
 #   • Keep Go modules, GitHub Actions, DevContainer images/features, and Docker
@@ -49,7 +49,7 @@ updates:
           - "*oauth*"
         update-types: ["minor", "patch"]
     open-pull-requests-limit: 10
-    assignees: ["galt-tr", "mrz1836"]
+    assignees: ["mrz1836"]
     labels: ["chore", "dependencies", "gomod"]
     commit-message:
       prefix: "chore"
@@ -72,7 +72,7 @@ updates:
       ghactions-all:
         patterns: ["*"]
     open-pull-requests-limit: 10
-    assignees: ["galt-tr", "mrz1836"]
+    assignees: ["mrz1836"]
     labels: ["chore", "dependencies", "github-actions"]
     commit-message:
       prefix: "chore"
@@ -95,7 +95,7 @@ updates:
       devcontainer-all:
         patterns: ["*"]
     open-pull-requests-limit: 5
-    assignees: ["galt-tr", "mrz1836"]
+    assignees: ["mrz1836"]
     labels: ["chore", "dependencies", "devcontainer"]
     commit-message:
       prefix: "chore"
@@ -121,7 +121,7 @@ updates:
       dockerfiles-all:
         patterns: ["*"]
     open-pull-requests-limit: 5
-    assignees: ["galt-tr", "mrz1836"]
+    assignees: ["mrz1836"]
     labels: ["chore", "dependencies", "docker"]
     commit-message:
       prefix: "chore"

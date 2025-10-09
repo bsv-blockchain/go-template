@@ -180,7 +180,7 @@ magex InstallTemplate owner=acme repo=awesome-api
 
 	* `bsv-blockchain/go-template` → `yourorg/yourproject`
 	* `go-template` → `yourproject`
-	* `mrz1836` → `yourorg`
+	* `bsv-blockchain` → `yourorg`
 
 2. **Cleans up template artifacts**
 

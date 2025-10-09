@@ -17,13 +17,13 @@ import (
 const (
 	testOwnerArg      = "owner=testowner"
 	testRepoArg       = "repo=testrepo"
-	testTemplateRepo  = "bsv-blockchain/go-template"
+	testTemplateRepo  = "testowner/go-template"
 	testMainGoFile    = "main.go"
 	testImagePngFile  = "image.png"
 	testOwnerRepoPath = "testowner/testrepo"
 	testGoFile        = "test.go"
 	testGoTemplate    = "go-template"
-	testBsvBlockchain = "bsv-blockchain"
+	testOrg           = "testowner"
 )
 
 func TestValidatePath(t *testing.T) {
@@ -262,11 +262,11 @@ func TestApplyReplacements(t *testing.T) {
 		},
 		{
 			name:    "multiple replacements",
-			content: testTemplateRepo + " and " + testGoTemplate + " by " + testBsvBlockchain,
+			content: testTemplateRepo + " and " + testGoTemplate + " by " + testOrg,
 			replacements: []struct{ from, to string }{
 				{testTemplateRepo, testOwnerRepoPath},
 				{testGoTemplate, "testrepo"},
-				{testBsvBlockchain, "testowner"},
+				{testOrg, "testowner"},
 			},
 			path:         testGoFile,
 			wantContent:  testOwnerRepoPath + " and testrepo by testowner",
@@ -303,16 +303,89 @@ func TestApplyReplacements(t *testing.T) {
 	}
 }
 
+func TestGetTemplateInfo(t *testing.T) {
+	// This test runs from the magefiles directory, so we need to go up one level
+	originalDir, err := os.Getwd()
+	require.NoError(t, err)
+
+	// Change to parent directory where go.mod exists
+	err = os.Chdir("..")
+	require.NoError(t, err)
+
+	defer func() {
+		// Restore original directory
+		_ = os.Chdir(originalDir)
+	}()
+
+	owner, repo, err := getTemplateInfo()
+	require.NoError(t, err)
+	assert.NotEmpty(t, owner, "owner should not be empty")
+	assert.NotEmpty(t, repo, "repo should not be empty")
+	assert.Equal(t, "mrz1836", owner, "owner should match go.mod")
+	assert.Equal(t, "go-template", repo, "repo should match go.mod")
+}
+
+func TestGetTemplateInfoError(t *testing.T) {
+	// Test error case when go.mod doesn't exist
+	originalDir, err := os.Getwd()
+	require.NoError(t, err)
+
+	// Create a temporary directory without go.mod
+	tmpDir := t.TempDir()
+	err = os.Chdir(tmpDir)
+	require.NoError(t, err)
+
+	defer func() {
+		// Restore original directory
+		_ = os.Chdir(originalDir)
+	}()
+
+	_, _, err = getTemplateInfo()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to open go.mod")
+}
+
 func TestCreateReplacements(t *testing.T) {
 	owner := "testowner"
 	repo := "testrepo"
 
+	// Change to parent directory where go.mod exists
+	originalDir, err := os.Getwd()
+	require.NoError(t, err)
+
+	err = os.Chdir("..")
+	require.NoError(t, err)
+
+	defer func() {
+		// Restore original directory
+		_ = os.Chdir(originalDir)
+	}()
+
 	replacements := createReplacements(owner, repo)
 
+	// The replacements should use the values from go.mod
 	expected := []struct{ from, to string }{
-		{testTemplateRepo, testOwnerRepoPath},
+		{"mrz1836/go-template", testOwnerRepoPath},
 		{testGoTemplate, "testrepo"},
-		{testBsvBlockchain, "testowner"},
+		{"mrz1836", "testowner"},
+	}
+
+	assert.Equal(t, expected, replacements)
+}
+
+func TestCreateReplacementsFallback(t *testing.T) {
+	owner := "testowner"
+	repo := "testrepo"
+
+	// Test fallback behavior when go.mod is not accessible
+	// Stay in magefiles directory where go.mod doesn't exist
+	replacements := createReplacements(owner, repo)
+
+	// Should use fallback values
+	expected := []struct{ from, to string }{
+		{"mrz1836/go-template", testOwnerRepoPath},
+		{testGoTemplate, "testrepo"},
+		{"mrz1836", "testowner"},
 	}
 
 	assert.Equal(t, expected, replacements)
@@ -511,11 +584,11 @@ func BenchmarkIsBinaryFile(b *testing.B) {
 }
 
 func BenchmarkApplyReplacements(b *testing.B) {
-	content := strings.Repeat(testTemplateRepo+" is a template by "+testBsvBlockchain+" for "+testGoTemplate+" projects. ", 100)
+	content := strings.Repeat(testTemplateRepo+" is a template by "+testOrg+" for "+testGoTemplate+" projects. ", 100)
 	replacements := []struct{ from, to string }{
 		{testTemplateRepo, testOwnerRepoPath},
 		{testGoTemplate, "testrepo"},
-		{testBsvBlockchain, "testowner"},
+		{testOrg, "testowner"},
 	}
 
 	b.ResetTimer()

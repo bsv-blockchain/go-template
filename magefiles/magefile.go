@@ -172,7 +172,7 @@ func createReplacements(owner, repo string) []struct{ from, to string } {
 	}{
 		{"bsv-blockchain/go-template", fmt.Sprintf("%s/%s", owner, repo)},
 		{"go-template", repo},
-		{"mrz1836", owner},
+		{"bsv-blockchain", owner},
 	}
 }
 

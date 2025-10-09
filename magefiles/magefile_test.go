@@ -15,11 +15,15 @@ import (
 
 // Test constants to avoid code duplication
 const (
-	testOwnerArg     = "owner=testowner"
-	testRepoArg      = "repo=testrepo"
-	testTemplateRepo = "bsv-blockchain/go-template"
-	testMainGoFile   = "main.go"
-	testImagePngFile = "image.png"
+	testOwnerArg      = "owner=testowner"
+	testRepoArg       = "repo=testrepo"
+	testTemplateRepo  = "bsv-blockchain/go-template"
+	testMainGoFile    = "main.go"
+	testImagePngFile  = "image.png"
+	testOwnerRepoPath = "testowner/testrepo"
+	testGoFile        = "test.go"
+	testGoTemplate    = "go-template"
+	testBsvBlockchain = "bsv-blockchain"
 )
 
 func TestValidatePath(t *testing.T) {
@@ -250,22 +254,22 @@ func TestApplyReplacements(t *testing.T) {
 			name:    "single replacement",
 			content: "package " + testTemplateRepo,
 			replacements: []struct{ from, to string }{
-				{testTemplateRepo, "testowner/testrepo"},
+				{testTemplateRepo, testOwnerRepoPath},
 			},
-			path:         "test.go",
-			wantContent:  "package testowner/testrepo",
+			path:         testGoFile,
+			wantContent:  "package " + testOwnerRepoPath,
 			wantModified: true,
 		},
 		{
 			name:    "multiple replacements",
-			content: testTemplateRepo + " and go-template by bsv-blockchain",
+			content: testTemplateRepo + " and " + testGoTemplate + " by " + testBsvBlockchain,
 			replacements: []struct{ from, to string }{
-				{testTemplateRepo, "testowner/testrepo"},
-				{"go-template", "testrepo"},
-				{"bsv-blockchain", "testowner"},
+				{testTemplateRepo, testOwnerRepoPath},
+				{testGoTemplate, "testrepo"},
+				{testBsvBlockchain, "testowner"},
 			},
-			path:         "test.go",
-			wantContent:  "testowner/testrepo and testrepo by testowner",
+			path:         testGoFile,
+			wantContent:  testOwnerRepoPath + " and testrepo by testowner",
 			wantModified: true,
 		},
 		{
@@ -306,9 +310,9 @@ func TestCreateReplacements(t *testing.T) {
 	replacements := createReplacements(owner, repo)
 
 	expected := []struct{ from, to string }{
-		{testTemplateRepo, "testowner/testrepo"},
-		{"go-template", "testrepo"},
-		{"bsv-blockchain", "testowner"},
+		{testTemplateRepo, testOwnerRepoPath},
+		{testGoTemplate, "testrepo"},
+		{testBsvBlockchain, "testowner"},
 	}
 
 	assert.Equal(t, expected, replacements)
@@ -507,11 +511,11 @@ func BenchmarkIsBinaryFile(b *testing.B) {
 }
 
 func BenchmarkApplyReplacements(b *testing.B) {
-	content := strings.Repeat(testTemplateRepo+" is a template by bsv-blockchain for go-template projects. ", 100)
+	content := strings.Repeat(testTemplateRepo+" is a template by "+testBsvBlockchain+" for "+testGoTemplate+" projects. ", 100)
 	replacements := []struct{ from, to string }{
-		{testTemplateRepo, "testowner/testrepo"},
-		{"go-template", "testrepo"},
-		{"bsv-blockchain", "testowner"},
+		{testTemplateRepo, testOwnerRepoPath},
+		{testGoTemplate, "testrepo"},
+		{testBsvBlockchain, "testowner"},
 	}
 
 	b.ResetTimer()

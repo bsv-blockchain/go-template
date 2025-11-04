@@ -78,7 +78,7 @@ jobs:
       # Download specific artifacts needed for test analysis
       # --------------------------------------------------------------------
       - name: 📥 Download test statistics
-        if: always()
+        if: always() && env.ENABLE_GO_TESTS == 'true'
         uses: ./.github/actions/download-artifact-resilient
         with:
           pattern: "test-stats-*"
@@ -114,7 +114,7 @@ jobs:
           continue-on-error: ${{ env.ARTIFACT_DOWNLOAD_CONTINUE_ON_ERROR }}
 
       - name: 📥 Download test failure artifacts
-        if: always()
+        if: always() && env.ENABLE_GO_TESTS == 'true'
         uses: ./.github/actions/download-artifact-resilient
         with:
           pattern: "test-results-unit-*"
@@ -126,7 +126,7 @@ jobs:
           continue-on-error: ${{ env.ARTIFACT_DOWNLOAD_CONTINUE_ON_ERROR }}
 
       - name: 📥 Download fuzz test failure artifacts
-        if: always()
+        if: always() && env.ENABLE_GO_TESTS == 'true' && env.ENABLE_FUZZ_TESTING == 'true'
         uses: ./.github/actions/download-artifact-resilient
         with:
           pattern: "test-results-fuzz-*"

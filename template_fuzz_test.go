@@ -3,8 +3,9 @@ package template_test
 import (
 	"testing"
 
-	"github.com/bsv-blockchain/go-template"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bsv-blockchain/go-template"
 )
 
 // FuzzGreet validates that Greet always returns a string that starts with "Hello " and is at least 6 characters long.

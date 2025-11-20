@@ -3,9 +3,10 @@ package template_test
 import (
 	"testing"
 
-	"github.com/bsv-blockchain/go-template"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bsv-blockchain/go-template"
 )
 
 // TestGreet tests the Greet function with various input scenarios using table-driven tests.

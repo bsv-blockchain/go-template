@@ -49,16 +49,14 @@ on:
         required: true
         type: string
 
-# Security: Restrictive default permissions with job-level overrides for least privilege access
-permissions:
-  contents: read
-
 jobs:
   # ----------------------------------------------------------------------------------
   # Warm Cache Matrix (Parallel)
   # ----------------------------------------------------------------------------------
   warm-cache-matrix:
     name: 💾 Warm Cache (${{ matrix.name }})
+    permissions:
+      contents: read
     strategy:
       fail-fast: true
       matrix: ${{ fromJSON(inputs.warm-cache-matrix) }}

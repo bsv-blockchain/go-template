@@ -96,11 +96,6 @@ on:
         type: string
         default: "full"
 
-# Security: Restrictive default permissions with job-level overrides for least privilege access
-permissions:
-  contents: read
-  actions: read # Required for artifact downloads
-
 jobs:
   # ----------------------------------------------------------------------------------
   # Initialize Report and Download Artifacts
@@ -109,6 +104,9 @@ jobs:
     name: 📊 Initialize Report Data
     runs-on: ${{ inputs.primary-runner }}
     if: always()
+    permissions:
+      contents: read
+      actions: read
     outputs:
       timing-data: ${{ steps.calculate-timing.outputs.timing-json }}
     steps:

@@ -87,10 +87,6 @@ on:
         description: "GitHub token for API access"
         required: true
 
-# Security: Restrictive default permissions with job-level overrides for least privilege access
-permissions:
-  contents: read
-
 jobs:
   # ----------------------------------------------------------------------------------
   # Benchmark Matrix for Go (Parallel)
@@ -98,6 +94,8 @@ jobs:
   benchmark-go:
     name: 🏃 Benchmark (${{ matrix.name }})
     timeout-minutes: ${{ inputs.benchmark-timeout }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false # Continue running other benchmarks if one fails
       matrix: ${{ fromJSON(inputs.benchmark-matrix) }}

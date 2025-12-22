@@ -41,11 +41,6 @@ on:
         description: "Coverage metrics"
         value: ${{ jobs.process-statistics.outputs.coverage-data }}
 
-# Security: Restrictive default permissions with job-level overrides for least privilege access
-permissions:
-  contents: read
-  actions: read # Required for artifact downloads
-
 jobs:
   # ----------------------------------------------------------------------------------
   # Statistics Processing
@@ -54,6 +49,9 @@ jobs:
     name: 📊 Process Statistics
     runs-on: ubuntu-latest
     if: always()
+    permissions:
+      contents: read
+      actions: read
     outputs:
       statistics-markdown: ${{ steps.set-output.outputs.content }}
       cache-data: ${{ steps.process-cache.outputs.cache-metrics }}

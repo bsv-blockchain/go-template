@@ -41,6 +41,9 @@ on:
         description: "List of checks that were executed"
         value: ${{ jobs.pre-commit.outputs.checks-executed }}
 
+# Security: Restrict default permissions (jobs must explicitly request what they need)
+permissions: {}
+
 jobs:
   # ----------------------------------------------------------------------------------
   # Pre-commit Checks Execution

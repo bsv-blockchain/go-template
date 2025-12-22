@@ -87,6 +87,9 @@ on:
         description: "GitHub token for API access"
         required: true
 
+# Security: Restrict default permissions (jobs must explicitly request what they need)
+permissions: {}
+
 jobs:
   # ----------------------------------------------------------------------------------
   # Benchmark Matrix for Go (Parallel)

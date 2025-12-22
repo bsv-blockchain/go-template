@@ -41,6 +41,9 @@ on:
         description: "Coverage metrics"
         value: ${{ jobs.process-statistics.outputs.coverage-data }}
 
+# Security: Restrict default permissions (jobs must explicitly request what they need)
+permissions: {}
+
 jobs:
   # ----------------------------------------------------------------------------------
   # Statistics Processing

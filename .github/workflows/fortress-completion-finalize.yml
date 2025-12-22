@@ -40,6 +40,9 @@ on:
         description: "Complete assembled report"
         value: ${{ jobs.finalize-report.outputs.report-content }}
 
+# Security: Restrict default permissions (jobs must explicitly request what they need)
+permissions: {}
+
 jobs:
   # ----------------------------------------------------------------------------------
   # Report Finalization

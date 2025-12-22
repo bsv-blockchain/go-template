@@ -22,6 +22,9 @@ on:
         required: true
         type: string
 
+# Security: Restrict default permissions (jobs must explicitly request what they need)
+permissions: {}
+
 jobs:
   # ----------------------------------------------------------------------------------
   # Test MAGE-X (Installation and Command Verification)

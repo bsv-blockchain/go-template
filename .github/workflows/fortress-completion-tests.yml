@@ -38,6 +38,9 @@ on:
         description: "Test failure analysis metrics"
         value: ${{ jobs.analyze-tests.outputs.failure-data }}
 
+# Security: Restrict default permissions (jobs must explicitly request what they need)
+permissions: {}
+
 jobs:
   # ----------------------------------------------------------------------------------
   # Test Analysis

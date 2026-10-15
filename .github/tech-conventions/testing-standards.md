@@ -24,7 +24,7 @@ We use the `testify` suite for unit tests. All tests must follow these conventio
 * Mock external dependencies — tests should be fast and deterministic
 * Use descriptive test names that explain the scenario being tested
 * Test error cases — ensure your error handling actually works
-* Use the test's own helpers: `t.Context()` instead of `context.Background()`, `t.Setenv()` instead of `os.Setenv()` (it restores the variable when the test ends; a test that calls it can't use `t.Parallel()`), `t.Chdir()` instead of `os.Chdir()`, and `t.TempDir()` instead of `os.MkdirTemp()`
+* Use the test's own helpers: `t.Context()` instead of `context.Background()`, `t.Setenv()` instead of `os.Setenv()`, `t.Chdir()` instead of `os.Chdir()`, and `t.TempDir()` instead of `os.MkdirTemp()`. `t.Setenv()` and `t.Chdir()` restore process state when the test ends; neither can be used in parallel tests or tests with parallel ancestors
 * Handle all errors in tests properly:
 	* `os.Unsetenv()` returns an error - use `require.NoError(t, err)`
 	* `db.Close()` in defer statements - wrap in anonymous function: `defer func() { _ = db.Close() }()`

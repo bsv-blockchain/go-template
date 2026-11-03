@@ -60,7 +60,8 @@ on:
     # - reopened: a reopened PR may need arming (or labeling) again
     # - auto_merge_enabled: a manual arming with "Changes Requested" outstanding
     #   (the App's own arming fires it too; that evaluation finds it already
-    #   enabled, and never cancels the apply job that armed it)
+    #   enabled and queues a no-op re-check behind the apply job that armed it,
+    #   never cancelling it)
     # - closed: fork PR cache cleanup (PR Management)
     # `auto_merge_disabled` is deliberately absent: re-evaluating it would re-arm a
     # PR a maintainer just disarmed. Use a WIP label to hold a PR instead.
